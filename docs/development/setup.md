@@ -29,6 +29,12 @@ Run
 > scripts/setup
 ```
 
+as well as
+
+```
+> scripts/setup --cosmos
+```
+
 To build set up the development cluster, build docker images,
 and set up test data.
 
