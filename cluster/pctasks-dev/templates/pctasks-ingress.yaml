@@ -20,14 +20,7 @@ spec:
     - host: {{ . }}
       http:
         paths:
-          - path: {{ $.Values.pcdev.services.pctasks.path }}/
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ $.Values.pcdev.services.pctasks.name }}
-                port:
-                  number: {{ $.Values.pcdev.services.pctasks.port }}
-          - path: {{ trimSuffix "/" $.Values.pcdev.services.pctasks.path }}
+          - path: {{ $.Values.pcdev.services.pctasks.path }}
             pathType: Exact
             backend:
               service:

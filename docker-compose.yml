@@ -29,144 +29,144 @@ services:
       - pctasks-pgdata:/var/lib/postgresql/data
     command: postgres -N 500
 
-  nginx:
-    image: pctasks-nginx
-    container_name: pctasks-nginx
-    build:
-      context: ./dev/nginx
-      dockerfile: Dockerfile
-    volumes:
-      - ./dev/nginx/etc/nginx:/etc/nginx
-    ports:
-      - 8510:80
-    depends_on:
-      - server
+  # nginx:
+  #   image: pctasks-nginx
+  #   container_name: pctasks-nginx
+  #   build:
+  #     context: ./dev/nginx
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./dev/nginx/etc/nginx:/etc/nginx
+  #   ports:
+  #     - 8510:80
+  #   depends_on:
+  #     - server
 
-  server:
-    container_name: pctasks-server
-    image: pctasks-server
-    build:
-      context: pctasks
-      dockerfile: server/Dockerfile
-      args:
-        - DEVELOPMENT=TRUE
-    environment:
-      - APP_ROOT_PATH=/tasks
-      - APP_PORT=8511
-      - WEB_CONCURRENCY=1
+  # server:
+  #   container_name: pctasks-server
+  #   image: pctasks-server
+  #   build:
+  #     context: pctasks
+  #     dockerfile: server/Dockerfile
+  #     args:
+  #       - DEVELOPMENT=TRUE
+  #   environment:
+  #     - APP_ROOT_PATH=/tasks
+  #     - APP_PORT=8511
+  #     - WEB_CONCURRENCY=1
 
-      - AZURE_TENANT_ID
-      - AZURE_CLIENT_ID
-      - AZURE_CLIENT_SECRET
+  #     - AZURE_TENANT_ID
+  #     - AZURE_CLIENT_ID
+  #     - AZURE_CLIENT_SECRET
 
-      - PCTASKS_SERVER__DEV=true
-      - PCTASKS_SERVER__DEV_API_KEY=hunter2
-      - PCTASKS_SERVER__DEV_AUTH_TOKEN=Bearer hunter2
+  #     - PCTASKS_SERVER__DEV=true
+  #     - PCTASKS_SERVER__DEV_API_KEY=hunter2
+  #     - PCTASKS_SERVER__DEV_AUTH_TOKEN=Bearer hunter2
 
-      # Dev storage settings
-      - AZURITE_HOST=azurite
-      - AZURITE_PORT=10000
-      - AZURITE_STORAGE_ACCOUNT=devstoreaccount1
+  #     # Dev storage settings
+  #     - AZURITE_HOST=azurite
+  #     - AZURITE_PORT=10000
+  #     - AZURITE_STORAGE_ACCOUNT=devstoreaccount1
 
-      # Local secrets provider secrets
-      - SECRETS_DB_CONNECTION_STRING=postgresql://username:password@database:5432/postgis
+  #     # Local secrets provider secrets
+  #     - SECRETS_DB_CONNECTION_STRING=postgresql://username:password@database:5432/postgis
 
-      # Run settings #######################################################
+  #     # Run settings #######################################################
 
-      # Dev executor settings
-      - PCTASKS_RUN__TASK_RUNNER_TYPE=${PCTASKS_RUN__TASK_RUNNER_TYPE:-local}
-      - PCTASKS_RUN__LOCAL_DEV_ENDPOINTS_URL=http://local-dev-endpoints:8512
-      - PCTASKS_RUN__LOCAL_SECRETS=${PCTASKS_RUN__LOCAL_SECRETS:-true}
-      - PCTASKS_RUN__WORKFLOW_RUNNER_TYPE=local
+  #     # Dev executor settings
+  #     - PCTASKS_RUN__TASK_RUNNER_TYPE=${PCTASKS_RUN__TASK_RUNNER_TYPE:-local}
+  #     - PCTASKS_RUN__LOCAL_DEV_ENDPOINTS_URL=http://local-dev-endpoints:8512
+  #     - PCTASKS_RUN__LOCAL_SECRETS=${PCTASKS_RUN__LOCAL_SECRETS:-true}
+  #     - PCTASKS_RUN__WORKFLOW_RUNNER_TYPE=local
 
-      # streaming stuff
-      # These are unused in the local dev environment, which uses azurite.
-      - PCTASKS_RUN__STREAMING_TASKIO_SP_TENANT_ID=""
-      - PCTASKS_RUN__STREAMING_TASKIO_SP_CLIENT_ID=""
-      - PCTASKS_RUN__STREAMING_TASKIO_SP_CLIENT_SECRET=""
+  #     # streaming stuff
+  #     # These are unused in the local dev environment, which uses azurite.
+  #     - PCTASKS_RUN__STREAMING_TASKIO_SP_TENANT_ID=""
+  #     - PCTASKS_RUN__STREAMING_TASKIO_SP_CLIENT_ID=""
+  #     - PCTASKS_RUN__STREAMING_TASKIO_SP_CLIENT_SECRET=""
 
-      ## Azure Batch
+  #     ## Azure Batch
 
-      - PCTASKS_RUN__BATCH_URL
-      - PCTASKS_RUN__BATCH_KEY
-      - PCTASKS_RUN__BATCH_DEFAULT_POOL_ID
+  #     - PCTASKS_RUN__BATCH_URL
+  #     - PCTASKS_RUN__BATCH_KEY
+  #     - PCTASKS_RUN__BATCH_DEFAULT_POOL_ID
 
-      ## Key Vault
-      - PCTASKS_RUN__KEYVAULT_URL
+  #     ## Key Vault
+  #     - PCTASKS_RUN__KEYVAULT_URL
 
-      ## Azure Storage
+  #     ## Azure Storage
 
-      ### Queues
-      - PCTASKS_RUN__NOTIFICATION_QUEUE__CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;
-      - PCTASKS_RUN__INBOX_QUEUE__CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;
-      - PCTASKS_RUN__SIGNAL_QUEUE__CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;
-      - PCTASKS_RUN__SIGNAL_QUEUE_ACCOUNT_NAME=devstoreaccount1
-      - PCTASKS_RUN__SIGNAL_QUEUE_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+  #     ### Queues
+  #     - PCTASKS_RUN__NOTIFICATION_QUEUE__CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;
+  #     - PCTASKS_RUN__INBOX_QUEUE__CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;
+  #     - PCTASKS_RUN__SIGNAL_QUEUE__CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;
+  #     - PCTASKS_RUN__SIGNAL_QUEUE_ACCOUNT_NAME=devstoreaccount1
+  #     - PCTASKS_RUN__SIGNAL_QUEUE_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
 
-      ### Tables
-      - PCTASKS_RUN__TABLES_ACCOUNT_URL=http://azurite:10002/devstoreaccount1
-      - PCTASKS_RUN__TABLES_ACCOUNT_NAME=devstoreaccount1
-      - PCTASKS_RUN__TABLES_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+  #     ### Tables
+  #     - PCTASKS_RUN__TABLES_ACCOUNT_URL=http://azurite:10002/devstoreaccount1
+  #     - PCTASKS_RUN__TABLES_ACCOUNT_NAME=devstoreaccount1
+  #     - PCTASKS_RUN__TABLES_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
 
-      ### Cosmos DB
-      - COSMOSDB_EMULATOR_HOST=cosmosdb
-      - PCTASKS_COSMOSDB__URL=${PCTASKS_COSMOSDB__URL:-https://cosmosdb:8081/}
-      - PCTASKS_COSMOSDB__KEY=${PCTASKS_COSMOSDB__KEY:-C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==}
-      - PCTASKS_COSMOSDB__TEST_CONTAINER_SUFFIX
+  #     ### Cosmos DB
+  #     - COSMOSDB_EMULATOR_HOST=cosmosdb
+  #     - PCTASKS_COSMOSDB__URL=${PCTASKS_COSMOSDB__URL:-https://cosmosdb:8081/}
+  #     - PCTASKS_COSMOSDB__KEY=${PCTASKS_COSMOSDB__KEY:-C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==}
+  #     - PCTASKS_COSMOSDB__TEST_CONTAINER_SUFFIX
 
-      ### Blobs
-      - PCTASKS_RUN__BLOB_ACCOUNT_URL=http://azurite:10000/devstoreaccount1
-      - PCTASKS_RUN__BLOB_ACCOUNT_NAME=devstoreaccount1
-      - PCTASKS_RUN__BLOB_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+  #     ### Blobs
+  #     - PCTASKS_RUN__BLOB_ACCOUNT_URL=http://azurite:10000/devstoreaccount1
+  #     - PCTASKS_RUN__BLOB_ACCOUNT_NAME=devstoreaccount1
+  #     - PCTASKS_RUN__BLOB_ACCOUNT_KEY=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
 
-    volumes:
-      - ./pctasks:/opt/src
-    ports:
-      - "8511:8511"
-    command: >
-      bash -c "uvicorn pctasks.server.main:app --host 0.0.0.0 --port 8511 --reload --proxy-headers"
+  #   volumes:
+  #     - ./pctasks:/opt/src
+  #   ports:
+  #     - "8511:8511"
+  #   command: >
+  #     bash -c "uvicorn pctasks.server.main:app --host 0.0.0.0 --port 8511 --reload --proxy-headers"
 
-  local-dev-endpoints:
-    # HTTP endpoints for running tasks and serving secrets
-    container_name: pctasks-local-dev-endpoints
-    image: pctasks-dev
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    ports:
-      - "8512:8512"
-    volumes:
-      - .:/opt/src
-    environment:
-      - APP_PORT=8512
-      # Dev storage settings
-      - AZURITE_HOST=azurite
-      - AZURITE_PORT=10000
-      - AZURITE_STORAGE_ACCOUNT=devstoreaccount1
-      # Local dev secrets file
-      - DEV_SECRETS_FILE=/opt/src/dev-secrets.yaml
-      # Cosmos DB
-      - PCTASKS_COSMOSDB__TEST_CONTAINER_SUFFIX
+  # local-dev-endpoints:
+  #   # HTTP endpoints for running tasks and serving secrets
+  #   container_name: pctasks-local-dev-endpoints
+  #   image: pctasks-dev
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - "8512:8512"
+  #   volumes:
+  #     - .:/opt/src
+  #   environment:
+  #     - APP_PORT=8512
+  #     # Dev storage settings
+  #     - AZURITE_HOST=azurite
+  #     - AZURITE_PORT=10000
+  #     - AZURITE_STORAGE_ACCOUNT=devstoreaccount1
+  #     # Local dev secrets file
+  #     - DEV_SECRETS_FILE=/opt/src/dev-secrets.yaml
+  #     # Cosmos DB
+  #     - PCTASKS_COSMOSDB__TEST_CONTAINER_SUFFIX
 
-    command:
-      [
-        "uvicorn",
-        "pctasks.dev.local_dev_endpoints:app",
-        "--host",
-        "0.0.0.0",
-        "--port",
-        "8512",
-        "--reload",
-        "--proxy-headers"
-      ]
+  #   command:
+  #     [
+  #       "uvicorn",
+  #       "pctasks.dev.local_dev_endpoints:app",
+  #       "--host",
+  #       "0.0.0.0",
+  #       "--port",
+  #       "8512",
+  #       "--reload",
+  #       "--proxy-headers"
+  #     ]
 
-  # Used to let kind cluster pull local docker images
-  # See https://kind.sigs.k8s.io/docs/user/local-registry/
-  local-docker-registry:
-    container_name: pctasks-local-docker-reg
-    image: registry:2
-    ports:
-      - 5001:5000
+  # # Used to let kind cluster pull local docker images
+  # # See https://kind.sigs.k8s.io/docs/user/local-registry/
+  # local-docker-registry:
+  #   container_name: pctasks-local-docker-reg
+  #   image: registry:2
+  #   ports:
+  #     - 5001:5000
 
   functions:
     container_name: pctasks-functions
