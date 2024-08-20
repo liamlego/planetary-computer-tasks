@@ -122,6 +122,14 @@ export PCTASKS_COSMOSDB__KEY=<Account Key>
 
 If set, this will be used as the CosmosDB for all docker containers and the Kind cluster, and the CosmoDB Emulator will not be started as part of the normal scripts process.
 
+## Storage
+
+The azurite storage will be spun up, however you will want to run
+
+`python3 ./scripts/createcontainers.py`
+
+from your virtual environment after the first time it is created in order to create the appropriate blob and table containers.
+
 ## Setting up local secrets
 
 PCTasks uses a docker container run via `docker-compose`, brought up by `scripts/server`, to mock the functionality of KeyVault for fetching secrets.
